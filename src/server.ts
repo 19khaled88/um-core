@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import {PrismaClient} from '@prisma/client'
 import app from "./app";
 import config from "./config";
 import {successLogger,errorLogger} from "./shared/logger/logger";
@@ -12,12 +12,13 @@ process.on('uncaughtException',err=>{
 })
 
 let server:Server;
+const prisma = new PrismaClient()
 
 async function dbConn(){
     
     try {
-        await mongoose.connect(config.db_url as string)
-        successLogger.info('Database connected successfully')
+        await prisma.$connect();
+        successLogger.info('Postgresql database connected successfully')
 
        server = app.listen(config.port,()=>{
             successLogger.info(`connection established on ${config.port}`)
@@ -44,7 +45,9 @@ dbConn();
 process.on('SIGTERM',()=>{
     successLogger.info('SIGTERM is received')
     if(server){
-        server.close()
+        server.close(async()=>{
+            await prisma.$disconnect();
+        })
     }
 })
 

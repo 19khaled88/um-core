@@ -1,6 +1,6 @@
 import express from "express";
 import { userRoutes } from "../app/modules/faculty/router";
-
+import {academicSemesterRoutes} from '../app/modules/academicSemester/route'
 
 
 
@@ -8,9 +8,9 @@ const router  = express.Router();
 
 const moduleRoutes = [
     {
-        path:'/users/',
-        route:userRoutes
-    },
+        path:'/academic-semester/',
+        route:academicSemesterRoutes
+    }
     
 
     
