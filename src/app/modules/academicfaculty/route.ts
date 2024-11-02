@@ -10,15 +10,15 @@ const router = express.Router();
 router.post(
   "/create",
   validationRequest(AcademicFacultyValiation.createFacultyZodSchema),
-  academicfacultyController.createFaculty
+  academicfacultyController.createAcademicFaculty
 );
-router.get("/all", academicfacultyController.getAllFaculties);
-router.get("/:id", academicfacultyController.getSingleFaculty);
+router.get("/all", academicfacultyController.getAllAcademicFaculties);
+router.get("/:id", academicfacultyController.getSingleAcademicFaculty);
 router.put(
   "/:id",
   validationRequest(AcademicFacultyValiation.updateFacultyZodSchema),
-  academicfacultyController.updateFaculty
+  academicfacultyController.updateAcademicFaculty
 );
-router.delete("/:id", academicfacultyController.deleteFaculty);
+router.delete("/:id", academicfacultyController.deleteAcademicFaculty);
 
 export const academicfacultyRoutes = router;
