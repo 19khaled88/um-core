@@ -71,8 +71,19 @@ model Student {
   academicSemesterId   String
   academicDepartment   AcademicDepartment @relation(fields: [academicDepartmentId], references: [id])
   academicDepartmentId String
+  users                User[]
 
   @@map("students")
+}
+
+model User {
+  id                String   @id @default(uuid())
+  role              String
+  password          String
+  needsPassChange   Boolean
+  passwordChangedAt DateTime
+  students          Student  @relation(fields: [studentId], references: [id])
+  studentId         String
 }
 
 model Faculty {
@@ -95,4 +106,26 @@ model Faculty {
   academicDepartmentId String
 
   @@map("faculties")
+}
+
+model Building {
+  id        String   @id @default(uuid())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  rooms     Room[]
+
+  @@map("buildings")
+}
+
+model Room {
+  id         String   @id @default(uuid())
+  roomNumber String
+  floor      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  building   Building @relation(fields: [buildingId], references: [id])
+  buildingId String
+
+  @@map("rooms")
 }
