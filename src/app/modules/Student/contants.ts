@@ -1,0 +1,2 @@
+export const studentSearchableFields = ['firstName','lastName','dateOfBirth','gender','contactNo'];
+export const studentFilterableFields = ['searchTerm', 'firstName','lastName','dateOfBirth','gender','contactNo'];

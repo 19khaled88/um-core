@@ -60,6 +60,10 @@ model Student {
   middleName           String
   profileImage         String
   email                String
+  dateOfBirth          String
+  emergencyContactNo   String
+  permanentAddress     String
+  presentAddress       String
   contactNo            String
   gender               String
   bloodGroup           String
@@ -82,8 +86,12 @@ model User {
   password          String
   needsPassChange   Boolean
   passwordChangedAt DateTime
-  students          Student  @relation(fields: [studentId], references: [id])
-  studentId         String
+  students          Student? @relation(fields: [studentId], references: [id])
+  studentId         String?
+  faculties         Faculty? @relation(fields: [facultyId], references: [id])
+  facultyId         String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model Faculty {
@@ -94,6 +102,10 @@ model Faculty {
   middleName           String
   profileImage         String
   email                String
+  dateOfBirth          String
+  emergencyContactNo   String
+  permanentAddress     String
+  presentAddress       String
   contactNo            String
   gender               String
   bloodGroup           String
@@ -104,6 +116,7 @@ model Faculty {
   academicFacultyId    String
   academicDepartment   AcademicDepartment @relation(fields: [academicDepartmentId], references: [id])
   academicDepartmentId String
+  users                User[]
 
   @@map("faculties")
 }
@@ -128,4 +141,33 @@ model Room {
   buildingId String
 
   @@map("rooms")
+}
+
+model Admin {
+  id                     String               @id @default(uuid())
+  firstName              String
+  lastName               String
+  middleName             String
+  profileImage           String
+  email                  String
+  dateOfBirth            String
+  emergencyContactNo     String
+  permanentAddress       String
+  presentAddress         String
+  contactNo              String
+  gender                 String
+  bloodGroup             String
+  designation            String
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime
+  managementDepartments  ManagementDepartment @relation(fields: [managementDepartmentId], references: [id])
+  managementDepartmentId String
+}
+
+model ManagementDepartment {
+  id    String  @id @default(uuid())
+  title String  @unique
+  admins Admin[]
+
+  @@map("managementdepartments")
 }
