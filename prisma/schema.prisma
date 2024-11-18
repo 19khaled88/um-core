@@ -84,14 +84,18 @@ model User {
   id                String   @id @default(uuid())
   role              String
   password          String
-  needsPassChange   Boolean
+  needsPassChange   Boolean  @default(true)
   passwordChangedAt DateTime
   students          Student? @relation(fields: [studentId], references: [id])
-  studentId         String?
+  studentId         String?  @unique
   faculties         Faculty? @relation(fields: [facultyId], references: [id])
   facultyId         String?
+  admins            Admin?   @relation(fields: [adminId], references: [id])
+  adminId           String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+
+  @@map("users")
 }
 
 model Faculty {
@@ -143,6 +147,27 @@ model Room {
   @@map("rooms")
 }
 
+model Course {
+  id              String                 @id @default(uuid())
+  title           String
+  code            String
+  creadits        Int                    @default(0)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  preRequisite    CourseToPrerequisite[] @relation("CourseToPrequisite")
+  preRequisiteFor CourseToPrerequisite[] @relation("PrerequisiteToCourse")
+}
+
+model CourseToPrerequisite {
+  courseId       String
+  preRequisiteId String
+
+  course       Course @relation(fields: [courseId], references: [id], name: "CourseToPrequisite")
+  preRequisite Course @relation(fields: [preRequisiteId], references: [id], name: "PrerequisiteToCourse")
+
+  @@id([courseId, preRequisiteId])
+}
+
 model Admin {
   id                     String               @id @default(uuid())
   firstName              String
@@ -162,12 +187,24 @@ model Admin {
   updatedAt              DateTime
   managementDepartments  ManagementDepartment @relation(fields: [managementDepartmentId], references: [id])
   managementDepartmentId String
+  User                   User[]
+
+  @@map("admins")
 }
 
 model ManagementDepartment {
-  id    String  @id @default(uuid())
-  title String  @unique
-  admins Admin[]
+  id        String   @id @default(uuid())
+  title     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  admins    Admin[]
 
   @@map("managementdepartments")
+}
+
+model Auth {
+  userId   String @id
+  password String
+
+  @@map("auths")
 }

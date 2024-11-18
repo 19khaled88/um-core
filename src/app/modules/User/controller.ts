@@ -3,6 +3,7 @@ import catchAsnc from "../../../shared/catchAsync";
 import { userService } from "./services";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
+import ApiError from "../../../errors/ApiError";
 
 
 const createStudent = catchAsnc(async(req:Request,res:Response)=>{
@@ -19,10 +20,11 @@ const createStudent = catchAsnc(async(req:Request,res:Response)=>{
             data:result
         })
     } catch (error) {
+        const errorMessage = error instanceof  ApiError ? error.message : 'Failed to create user'
         sendResponse(res,{
             statusCode:httpStatus.BAD_REQUEST,
             success:false,
-            message:'Failed to create user',
+            message:errorMessage,
             data:null
         })
     }

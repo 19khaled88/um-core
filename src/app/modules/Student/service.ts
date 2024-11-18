@@ -94,21 +94,26 @@ const getAllStudent = async(
 
 }
 
-const getSingleStudent = async(id:string)=>{
+const getSingleStudent = async(id:string):Promise<Student | null>=>{
     const result = await prisma.student.findFirst({
         where:{id:id}
     })
     return result
 }
 
-const deleteStudent = async(id:string)=>{
+const deleteStudent = async(id:string):Promise<Student>=>{
     const result = await prisma.student.delete({
-        where:{id:id}
+        where:{id:id},
+        include:{
+          academicDepartment:true,
+          academicFaculty:true,
+          academicSemester:true
+        }
     })
     return result
 }
 
-const updateStudent = async(id:string,payload:Partial<Student>)=>{
+const updateStudent = async(id:string,payload:Partial<Student>):Promise<Student>=>{
     const result = await prisma.student.update({
         where:{id:id},
         data:payload

@@ -93,7 +93,6 @@ const updateSemester = catchAsnc(
     }
   );
 
-
 const deleteSemester = catchAsnc(
     async (req: Request, res: Response, next: NextFunction) => {
       try {

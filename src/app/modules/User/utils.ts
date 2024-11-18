@@ -1,4 +1,6 @@
 import { PrismaClient, User, Student, AcademicSemester } from "@prisma/client";
+import ApiError from "../../../errors/ApiError";
+import httpStatus from "http-status";
 
 const prisma = new PrismaClient();
 
@@ -43,7 +45,7 @@ export const generateStudentId = async ({
   code,
 }: Partial<AcademicSemester>): Promise<string> => {
   if (year === undefined || code === undefined) {
-    throw new Error("Year and code are required to generate the student ID.");
+    throw new ApiError(httpStatus.BAD_REQUEST,"Year and code are required to generate the student ID.");
   }
 
   const currentId =

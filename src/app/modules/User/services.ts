@@ -3,8 +3,9 @@ import config from "../../../config";
 import { generateFacultyId, generateStudentId } from "./utils";
 import ApiError from "../../../errors/ApiError";
 import httpStatus from "http-status";
+import hashPrisma from "../../middlewares/hashPass";
 
-const prisma = new PrismaClient();
+const prismaClient = new PrismaClient();
 
 const createStudent = async (
     student: Student,
@@ -14,9 +15,11 @@ const createStudent = async (
       user.password = config.default_st_pass as string;
     }
   
-    user.role = "student";
-    const academicSemester = await prisma.academicSemester.findUnique({where:{id:student.academicSemesterId}} );
   
+    user.role = "student";
+    const academicSemester = await prismaClient.academicSemester.findUnique({where:{id:student.academicSemesterId}} );
+  
+    console.log(academicSemester)
     let newUserData = null;
   
     try {
@@ -28,13 +31,15 @@ const createStudent = async (
       student.studentId = id;
   
       // Create student
-      const newStudent = await prisma.student.create({data:student});
+      const newStudent = await prismaClient.student.create({data:student});
       if (!newStudent) {
         throw new ApiError(httpStatus.BAD_REQUEST, "Failed to create student");
       }
   
       // Attach student to user
       user.studentId = newStudent.id;
+
+      
   
       // const newUserDataInput: Prisma.UserCreateInput = {
       //   id:user.id,
@@ -49,8 +54,7 @@ const createStudent = async (
       // };
 
       // Create user
-      const newUser = await prisma.user.create({data:{
-        
+      const newUser = await hashPrisma.user.create({data:{
         role:user.role,
         password:user.password,
         studentId:user.studentId,
@@ -75,7 +79,7 @@ const createStudent = async (
     }
   
     if (newUserData) {
-      newUserData = await prisma.user.findFirst({ 
+      newUserData = await hashPrisma.user.findFirst({ 
         where:{id: newUserData.id},
         include:{
             students:{
@@ -90,6 +94,7 @@ const createStudent = async (
     }
   
     return newUserData;
+    // return null
   };
 
 const createFaculty = async(
@@ -110,7 +115,7 @@ const createFaculty = async(
     user.facultyId = id
     faculty.facultyId = id
 
-    const newFaculty = await prisma.faculty.create({
+    const newFaculty = await prismaClient.faculty.create({
       data:faculty
     })
 
@@ -120,7 +125,7 @@ const createFaculty = async(
 
     user.facultyId = newFaculty.id
 
-    const newUser = await prisma.user.create({
+    const newUser = await prismaClient.user.create({
       data:{
         role:user.role,
         password:user.password,
@@ -142,7 +147,7 @@ const createFaculty = async(
   }
 
   if(newUserData){
-    newUserData = await prisma.user.findFirst({
+    newUserData = await prismaClient.user.findFirst({
       where:{id:newUserData.id},
       include:{
         faculties:{
@@ -160,6 +165,8 @@ const createFaculty = async(
 const createAdmin = async()=>{
   
 }
+
+
 
 export const userService = {
   createStudent,

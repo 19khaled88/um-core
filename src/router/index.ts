@@ -5,6 +5,9 @@ import { academicDepartmentRoutes } from "../app/modules/academicDepartment/rout
 import { userRoutes } from "../app/modules/User/router";
 import { managementDepartmentRouter } from "../app/modules/managementDepartment/router";
 import { studentRouter } from "../app/modules/Student/router";
+import { authRoutes } from "../app/modules/Auth/router";
+import { buildingRoutes } from "../app/modules/building/router";
+import { roomRoutes } from "../app/modules/room/router";
 
 
 
@@ -33,6 +36,18 @@ const moduleRoutes = [
     {
         path:'/students',
         route:studentRouter
+    },
+    {
+        path:'/auth',
+        route:authRoutes
+    },
+    {
+        path:'/building',
+        route:buildingRoutes
+    },
+    {
+        path:'/room',
+        route:roomRoutes
     }
 
 ];
