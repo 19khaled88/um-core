@@ -9,7 +9,7 @@ export type IStudentFilters = {
   };
 
 export type ICondition = {
-// OR?: { [key: string]: { contains: string; mode: Prisma.QueryMode } }[];
-OR?: { [key: string]: { contains: string; mode: Prisma.QueryMode } }[] | { [key: string]: number }[];
-AND?: { [key: string]: string | number | boolean | null }[];
+  // OR?: { [key: string]: { contains: string; mode: Prisma.QueryMode } }[];
+  OR?: { [key: string]: { contains: string; mode: Prisma.QueryMode } }[] | { [key: string]: number }[];
+  AND?: { [key: string]: string | number | boolean | null }[];
 };
