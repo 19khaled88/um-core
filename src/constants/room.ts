@@ -1,1 +1,1 @@
-export const searchAndFilterableFields:string[] = ['searchTerm', 'roomNumber','floor']
+export const searchAndFilterableFields:string[] = ['searchTerm', 'roomNumber','code','creadits']
