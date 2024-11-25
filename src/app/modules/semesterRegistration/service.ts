@@ -6,7 +6,10 @@ import {
 } from "@prisma/client";
 import ApiError from "../../../errors/ApiError";
 import httpStatus from "http-status";
-import { IGenericResponse, IPagniationOptions } from "../../../shared/interfaces";
+import {
+  IGenericResponse,
+  IPagniationOptions,
+} from "../../../shared/interfaces";
 import {
   ICondition,
   ISemesterRegistrationFilters,
@@ -49,7 +52,7 @@ const createSemesterRegistration = async (
 const getAllSemesterRegistrations = async (
   filters: ISemesterRegistrationFilters,
   paginationOptions: IPagniationOptions
-):Promise<IGenericResponse<SemesterRegistration[]>> => {
+): Promise<IGenericResponse<SemesterRegistration[]>> => {
   const { searchTerm, ...filterData } = filters;
   const { limit, page, skip, sortBy, sortOrder } =
     paginationHelper.calculatePagination(paginationOptions);
@@ -138,28 +141,125 @@ const getSingleSemesterRegistration = async (
   return result;
 };
 
-const deleteSemesterRegistration = async(id:string):Promise<SemesterRegistration>=>{
+const deleteSemesterRegistration = async (
+  id: string
+): Promise<SemesterRegistration> => {
   const result = await prisma.semesterRegistration.delete({
-      where:{id:id},
-      include:{
-       academicSemester:true,
-      }
-  })
-  return result
-}
-  
-const updateSemesterRegistration  = async(id:string,payload:Partial<SemesterRegistration>):Promise<SemesterRegistration>=>{
-  const result = await prisma.semesterRegistration.update({
-      where:{id:id},
-      data:payload
-  })
-  return result
-}
+    where: { id: id },
+    include: {
+      academicSemester: true,
+    },
+  });
+  return result;
+};
 
+// thorough check
+// const updateSemesterRegistration = async (
+//   id: string,
+//   payload: Partial<SemesterRegistration>
+// ): Promise<SemesterRegistration> => {
+//   // Fetch the current semester registration status
+//   const currentSemester = await prisma.semesterRegistration.findUnique({
+//     where: { id: id },
+//     select: { status: true },
+//   });
+
+//   if (!currentSemester) {
+//     throw new ApiError(
+//       httpStatus.BAD_REQUEST,
+//       "Semester registration not found"
+//     );
+//   }
+
+//   // Validate and update the status based on the current status
+//   if (payload.status) {
+//     const currentStatus = currentSemester.status;
+
+//     if (currentStatus === "UPCOMING" && payload.status !== "ONGOING") {
+//       throw new ApiError(
+//         httpStatus.BAD_REQUEST,
+//         "Invalid status update: Status can only be updated from 'UPCOMING' to 'ONGOING'."
+//       );
+//     }
+
+//     if (currentStatus === "ONGOING" && payload.status !== "ENDED") {
+//       throw new ApiError(
+//         httpStatus.BAD_REQUEST,
+//         "Invalid status update: Status can only be updated from 'ONGOING' to 'ENDED'."
+//       );
+//     }
+
+//     if (currentStatus === "ENDED") {
+//       throw new ApiError(
+//         httpStatus.BAD_REQUEST,
+//         "Invalid status update: Status cannot be changed from 'ENDED'."
+//       );
+//     }
+//   }
+
+//   const result = await prisma.semesterRegistration.update({
+//     where: { id: id },
+//     data: payload,
+//     include: {
+//       academicSemester: true,
+//     },
+//   });
+//   return result;
+// };
+
+// transition map check
+const updateSemesterRegistration = async (
+  id: string,
+  payload: Partial<SemesterRegistration>
+): Promise<SemesterRegistration> => {
+  // Define allowed status transitions
+  const statusTransitionMap: Record<
+    SemesterRegistrationStatus,
+    SemesterRegistrationStatus | null
+  > = {
+    UPCOMING: "ONGOING",
+    ONGOING: "ENDED",
+    ENDED: null, // No transitions allowed
+  };
+
+  // Fetch the current semester registration status
+  const currentSemester = await prisma.semesterRegistration.findUnique({
+    where: { id: id },
+    select: { status: true },
+  });
+
+  if (!currentSemester) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Semester registration not found"
+    );
+  }
+
+  const currentStatus = currentSemester.status as SemesterRegistrationStatus;
+
+  // Validate the status transition if `status` is being updated
+  if (payload.status && payload.status !== statusTransitionMap[currentStatus]) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      `Invalid status update: Status can only transition from '${currentStatus}' to '${
+        statusTransitionMap[currentStatus] ?? "no further state"
+      }'.`
+    );
+  }
+
+  const result = await prisma.semesterRegistration.update({
+    where: { id: id },
+    data: payload,
+    include: {
+      academicSemester: true,
+    },
+  });
+  return result;
+};
 export const semesterRegistrationService = {
   createSemesterRegistration,
   getAllSemesterRegistrations,
   getSingleSemesterRegistration,
   deleteSemesterRegistration,
-  updateSemesterRegistration
+  updateSemesterRegistration,
 };
