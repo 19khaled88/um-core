@@ -6,7 +6,8 @@ import handleValidationError from "../../errors/handleValidationError";
 import { errorLogger } from "../../shared/logger/logger";
 import { ZodError } from "zod";
 import handleZodError from "../../errors/handleZodError";
-import { handleCastError } from "../../errors/handleCastError";
+import { handleClientError } from "../../errors/handleClientError";
+import { Prisma } from "@prisma/client";
 
 const globalErrorHandler:ErrorRequestHandler =(
     err,
@@ -32,7 +33,7 @@ const globalErrorHandler:ErrorRequestHandler =(
             }
         ]:[]
     }
-    else if(err?.name === 'ValidationError'){
+    else if(err instanceof Prisma.PrismaClientValidationError){
         const simplifiedError = handleValidationError(err)
         statusCode = simplifiedError.statusCode;
         message = simplifiedError.message;
@@ -42,8 +43,8 @@ const globalErrorHandler:ErrorRequestHandler =(
         statusCode = simplifiedError.statusCode;
         message = simplifiedError.message;
         errorMessage = simplifiedError.errorMessage;
-    }else if(err?.name === 'CastError'){
-        const simplifiedError = handleCastError(err)
+    }else if(err instanceof Prisma.PrismaClientKnownRequestError){
+        const simplifiedError = handleClientError(err)
         statusCode = simplifiedError.statusCode;
         message = simplifiedError.message;
         errorMessage = simplifiedError.errorMessage;

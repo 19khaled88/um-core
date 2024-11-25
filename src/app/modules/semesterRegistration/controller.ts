@@ -8,6 +8,7 @@ import pick from "../../../shared/pick";
 import { searchAndFilterableFields } from "../../../constants/semesterRegistration";
 import { paginationFields } from "../../../constants/pagination";
 
+
 const createSemesterRegistration = catchAsnc(
   async (req: Request, res: Response) => {
     try {
