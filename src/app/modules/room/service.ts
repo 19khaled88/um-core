@@ -105,30 +105,32 @@ const getAllRoom = async(
   
   }
   
-  const getSingleRoom = async(id:string):Promise<Room | null>=>{
-    const result = await prisma.room.findFirst({
-      where:{id:id}
-    })
-    return result
-  }
+const getSingleRoom = async(id:string):Promise<Room | null>=>{
+  const result = await prisma.room.findFirst({
+    where:{id:id}
+  })
+  return result
+}
   
-  const deleteRoom = async(id:string):Promise<Room>=>{
-    const result = await prisma.room.delete({
-        where:{id:id},
-        include:{
-          building:true
-        }
-    })
-    return result
-  }
+const deleteRoom = async(id:string):Promise<Room>=>{
+  const result = await prisma.room.delete({
+      where:{id:id},
+      include:{
+        building:true
+      }
+  })
+  return result
+}
   
-  const updateRoom  = async(id:string,payload:Partial<Room>):Promise<Room>=>{
-    const result = await prisma.room.update({
-        where:{id:id},
-        data:payload
-    })
-    return result
-  }
+const updateRoom  = async(id:string,payload:Partial<Room>):Promise<Room>=>{
+  const result = await prisma.room.update({
+      where:{id:id},
+      data:payload
+  })
+  return result
+}
+
+
 export const roomService = {
     createRoom,
     getAllRoom,

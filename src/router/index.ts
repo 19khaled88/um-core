@@ -8,6 +8,8 @@ import { studentRouter } from "../app/modules/Student/router";
 import { authRoutes } from "../app/modules/Auth/router";
 import { buildingRoutes } from "../app/modules/building/router";
 import { roomRoutes } from "../app/modules/room/router";
+import { courseRoutes } from "../app/modules/course/router";
+import { semester_registration_routes } from "../app/modules/semesterRegistration/router";
 
 
 
@@ -48,6 +50,14 @@ const moduleRoutes = [
     {
         path:'/room',
         route:roomRoutes
+    },
+    {
+        path:'/course',
+        route:courseRoutes
+    },
+    {
+        path:'/semesterRegistration',
+        route:semester_registration_routes
     }
 
 ];
