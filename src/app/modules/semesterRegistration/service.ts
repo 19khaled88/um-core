@@ -256,6 +256,7 @@ const updateSemesterRegistration = async (
   });
   return result;
 };
+
 export const semesterRegistrationService = {
   createSemesterRegistration,
   getAllSemesterRegistrations,

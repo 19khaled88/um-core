@@ -11,6 +11,8 @@ import { roomRoutes } from "../app/modules/room/router";
 import { courseRoutes } from "../app/modules/course/router";
 import { semester_registration_routes } from "../app/modules/semesterRegistration/router";
 import { offeredCourseRoutes } from "../app/modules/offeredCourse/router";
+import { offeredCourseSectionRoutes } from "../app/modules/offeredCourseSection/router";
+import { offeredCourseClassScheduleRoutes } from "../app/modules/offeredCourseClassSchedule/router";
 
 
 
@@ -63,6 +65,14 @@ const moduleRoutes = [
     {
         path:'/offeredCourse',
         route:offeredCourseRoutes
+    },
+    {
+        path:'/offeredCourseSection',
+        route:offeredCourseSectionRoutes
+    },
+    {
+        path:'/offeredCourseSchedule',
+        route:offeredCourseClassScheduleRoutes
     }
 
 ];

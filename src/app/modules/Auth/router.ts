@@ -7,9 +7,12 @@ import { ENUM_USER_ROLE } from "../../../enums/user";
 import { AuthValidation } from "./validation";
 const router = express.Router();
 
-
 router.post("/refresh-token", authController.refreshToken);
-router.post("/login", validationRequest(AuthValidation.loginZodSchema),authController.login);
+router.post(
+  "/login",
+  validationRequest(AuthValidation.loginZodSchema),
+  authController.login
+);
 router.post(
   "/chanage-password",
   validationRequest(AuthValidation.changePasswordZodSchema),

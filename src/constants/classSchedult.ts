@@ -1,0 +1,1 @@
+export const searchAndFilterableFields:string[] = ['searchTerm', 'dayOfWeek']

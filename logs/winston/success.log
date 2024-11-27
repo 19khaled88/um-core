@@ -1119,3 +1119,9 @@
 {"level":"info","message":"connection established on 5000","service":"user-service","timestamp":"2024-11-19 00:32:38"}
 {"level":"info","message":"Postgresql database connected successfully","service":"user-service","timestamp":"2024-11-19 00:32:51"}
 {"level":"info","message":"connection established on 5000","service":"user-service","timestamp":"2024-11-19 00:32:51"}
+{"level":"info","message":"Postgresql database connected successfully","service":"user-service","timestamp":"2024-11-27 08:33:26"}
+{"level":"info","message":"connection established on 5000","service":"user-service","timestamp":"2024-11-27 08:33:26"}
+{"level":"info","message":"Postgresql database connected successfully","service":"user-service","timestamp":"2024-11-27 08:35:41"}
+{"level":"info","message":"connection established on 5000","service":"user-service","timestamp":"2024-11-27 08:35:42"}
+{"level":"info","message":"Postgresql database connected successfully","service":"user-service","timestamp":"2024-11-27 08:35:43"}
+{"level":"info","message":"connection established on 5000","service":"user-service","timestamp":"2024-11-27 08:35:43"}

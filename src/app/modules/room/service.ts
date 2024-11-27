@@ -103,7 +103,7 @@ const getAllRoom = async(
         data: result,
       };
   
-  }
+}
   
 const getSingleRoom = async(id:string):Promise<Room | null>=>{
   const result = await prisma.room.findFirst({
