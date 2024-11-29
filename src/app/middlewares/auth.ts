@@ -10,7 +10,9 @@ const auth =
   async (req: Request, res: Response, next: NextFunction) => {
     try {
      
-      let token = req.headers.authorization;
+      
+      // let token = req.headers.authorization;
+      let token = req.headers["authorization"]
       
       if (!token) {
         token = req.cookies.refreshtoken;
@@ -19,11 +21,13 @@ const auth =
       if (!token) {
         throw new ApiError(httpStatus.UNAUTHORIZED, "Not authorized");
       }
-
+      
       let verifiedToken = null;
       try {
-        verifiedToken = jwt.verify(token, config.jwt.refresh_token as Secret);
+        verifiedToken = jwt.verify(token, config.jwt.token as Secret);
+        
       } catch (error) {
+  
         throw new ApiError(httpStatus.FORBIDDEN, "Invalid token");
       }
 

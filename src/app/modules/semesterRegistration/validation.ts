@@ -18,17 +18,38 @@ const createSemesterRegistrationZodSchema = z.object({
 });
 
 const updateSemesterRegistrationZodSchema = z.object({
-    body: z.object({
-      startDate: z.string().optional(),
-      endDate: z.string().optional(),
-      status: z.enum(["UPCOMING", "ONGOING", "ENDED"]).optional(),
-      minCredit: z.number().int().min(0).optional(),
-      maxCredit: z.number().int().min(0).optional(),
-      academicSemesterId: z.string().optional(),
+  body: z.object({
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
+    status: z.enum(["UPCOMING", "ONGOING", "ENDED"]).optional(),
+    minCredit: z.number().int().min(0).optional(),
+    maxCredit: z.number().int().min(0).optional(),
+    academicSemesterId: z.string().optional(),
+  }),
+});
+
+const enrollOrWithdrawCourseZodSchema = z.object({
+  body: z.object({
+    offeredCourseId: z.string({
+      required_error: "Offered course id is required",
     }),
-  });
+    offeredCourseSectionId: z.string({
+      required_error: "Offered course section id is required",
+    }),
+  }),
+});
+
+const semesterCommencementZodSchema = z.object({
+  body: z.object({
+    id: z.string({
+      required_error: "Id is must",
+    })
+  }),
+});
 
 export const SemesterRegistrationValidation = {
   createSemesterRegistrationZodSchema,
   updateSemesterRegistrationZodSchema,
+  enrollOrWithdrawCourseZodSchema,
+  semesterCommencementZodSchema
 };

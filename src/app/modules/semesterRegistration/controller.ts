@@ -8,7 +8,6 @@ import pick from "../../../shared/pick";
 import { searchAndFilterableFields } from "../../../constants/semesterRegistration";
 import { paginationFields } from "../../../constants/pagination";
 
-
 const createSemesterRegistration = catchAsnc(
   async (req: Request, res: Response) => {
     try {
@@ -17,7 +16,7 @@ const createSemesterRegistration = catchAsnc(
       sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "",
+        message: "Semester created successfully",
         data: result,
       });
     } catch (error) {
@@ -25,6 +24,32 @@ const createSemesterRegistration = catchAsnc(
         error instanceof ApiError
           ? error.message
           : "Semester registration not created";
+      sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: false,
+        message: errorMessage,
+        data: null,
+      });
+    }
+  }
+);
+
+const startNewSemester = catchAsnc(
+  async (req: Request, res: Response) => {
+    try {
+      const result =
+        await semesterRegistrationService.startNewSemester(req.params.id);
+      sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Semester newly started successfully",
+        data: result,
+      });
+    } catch (error) {
+      const errorMessage =
+        error instanceof ApiError
+          ? error.message
+          : "Semester commencement gone to be failed";
       sendResponse(res, {
         statusCode: httpStatus.OK,
         success: false,
@@ -80,7 +105,7 @@ const getSinglSemesterRegistration = catchAsnc(
         data: result,
       });
     } catch (error) {
-      const errorMessage = 
+      const errorMessage =
         error instanceof ApiError
           ? error.message
           : "Semester registration not found for given ID";
@@ -143,10 +168,136 @@ const updateSemesterRegistration = catchAsnc(
   }
 );
 
+const registerToNewSemester = catchAsnc(async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+
+    const result = await semesterRegistrationService.registerToNewSemester(
+      user.role,
+      user.id
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Registration to new semester successful!",
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: "Registration to new semester unsuccessful!",
+      data: null,
+    });
+  }
+});
+
+const enrollCourse = catchAsnc(async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const result = await semesterRegistrationService.enrollIntoCourse(
+      user.role,
+      user.id,
+      req.body
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Registration to new course successful!",
+      data: result,
+    });
+  } catch (error) {
+    
+    sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: "Registration to new course unsuccessful!",
+      data: null,
+    });
+  }
+});
+
+const withdrawCourse = catchAsnc(async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const result = await semesterRegistrationService.withdrawCourse(
+      user.role,
+      user.id,
+      req.body
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Course withdrawn successfully!",
+      data: result,
+    });
+  } catch (error) {
+    
+    sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: "Course withdraw unsuccessful!",
+      data: null,
+    });
+  }
+});
+
+const confirmRegistration = catchAsnc(async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const result = await semesterRegistrationService.confirmRegistration(
+      // user.role,
+      user.id
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Registration confirmed successfully!",
+      data: result,
+    });
+  } catch (error) {
+   
+    sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: "Registration not confirmed!",
+      data: null,
+    });
+  }
+});
+
+const getMyRegistrations = catchAsnc(async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const result = await semesterRegistrationService.getMyRegistrations(
+      user.id
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Ongoing registrations retrieved successfully!",
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: "No onging registration found!",
+      data: null,
+    });
+  }
+});
+
 export const semesterRegistrationController = {
   createSemesterRegistration,
+  startNewSemester,
   getAllSemesterRegistration,
   getSinglSemesterRegistration,
   deleteSemesterRegistration,
   updateSemesterRegistration,
+  registerToNewSemester,
+  enrollCourse,
+  withdrawCourse,
+  confirmRegistration,
+  getMyRegistrations
 };
