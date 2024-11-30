@@ -288,6 +288,48 @@ const getMyRegistrations = catchAsnc(async (req: Request, res: Response) => {
   }
 });
 
+const updateStudentMarks = catchAsnc(async(req:Request,res:Response)=>{
+  try {
+    const result = await semesterRegistrationService.updateStudentMarks(
+      req.body
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Student marks updated successfully!",
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: "Marks update not successful!",
+      data: null,
+    });
+  }
+})
+
+const updateFinalMarks = catchAsnc(async(req:Request,res:Response)=>{
+  try {
+    const result = await semesterRegistrationService.updateFinalMarks(
+      req.body
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Final marks updated successfully!",
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: "Marks update not successful!",
+      data: null,
+    });
+  }
+})
+
 export const semesterRegistrationController = {
   createSemesterRegistration,
   startNewSemester,
@@ -299,5 +341,7 @@ export const semesterRegistrationController = {
   enrollCourse,
   withdrawCourse,
   confirmRegistration,
-  getMyRegistrations
+  getMyRegistrations,
+  updateStudentMarks,
+  updateFinalMarks
 };

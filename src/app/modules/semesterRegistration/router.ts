@@ -87,4 +87,14 @@ router.get(
   semesterRegistrationController.getMyRegistrations
 );
 
+router.patch(
+  "/marks-update/:id",
+  semesterRegistrationController.updateStudentMarks
+);
+
+router.patch(
+  "/final-marks-update/:id",
+  semesterRegistrationController.updateFinalMarks
+);
+
 export const semester_registration_routes = router;
