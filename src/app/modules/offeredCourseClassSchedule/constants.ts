@@ -13,3 +13,4 @@ export const offeredCourseScheduleRelationalMapper:{[key:string]:string} = {
     roomId:"room",
     facultyId:"faculty",
 }
+

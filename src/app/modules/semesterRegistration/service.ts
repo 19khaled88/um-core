@@ -6,6 +6,7 @@ import {
   PrismaClient,
   SemesterRegistration,
   SemesterRegistrationStatus,
+  StudentEnrolledCourse,
   StudentEnrolledCourseStatus,
   StudentSemesterRegistration,
   StudentSemesterRegistrationCourse,
@@ -23,7 +24,7 @@ import {
 } from "./interface";
 import { paginationHelper } from "../../../helper/paginationHelper";
 import { semesterRegistrationSearchableFields } from "./contants";
-import { StudentSemesterPayment } from "./utils";
+import { StudentSemesterUtils } from "./utils";
 
 const prisma = new PrismaClient();
 
@@ -118,7 +119,7 @@ const startNewSemester = async (id: string): Promise<{ message: string }> => {
             if (individualRegistration.totalCreditTaken) {
               const totalPaymentAmount =
                 individualRegistration.totalCreditTaken * 5000;
-              await StudentSemesterPayment.createSemesterPayment({
+              await StudentSemesterUtils.createSemesterPayment({
                 studentId: individualRegistration.studentId,
                 academicSemesterId: semesterRegistration.academicSemesterId,
                 totalPaymentAmount: totalPaymentAmount,
@@ -168,7 +169,7 @@ const startNewSemester = async (id: string): Promise<{ message: string }> => {
                       data: enrolledCourseData,
                     });
 
-                  await StudentSemesterPayment.createStudentsEnrolledCourseDefaultMarks(
+                  await StudentSemesterUtils.createStudentsEnrolledCourseDefaultMarks(
                     {
                       studentId: studentEnrolledCourseData.studentId,
                       studentEnrolledCourseId: studentEnrolledCourseData.id,
@@ -809,7 +810,7 @@ const updateStudentMarks = async (payload: any) => {
   //   grade = "A+";
   // }
 
-  const result = await getGrade(payload);
+  const result = await StudentSemesterUtils.getGrade(payload);
 
   const updateStudentMarks = await prisma.studentEnrolledCourseMark.update({
     where: {
@@ -823,7 +824,7 @@ const updateStudentMarks = async (payload: any) => {
   return updateStudentMarks;
 };
 
-const updateFinalMarks = async (payload: any) => {
+const updateFinalMarks = async (payload: any):Promise<StudentEnrolledCourse[]> => {
   const { studentId, academicSemesterId, courseId } = payload;
 
   const studentEnrolledCourse = await prisma.studentEnrolledCourse.findFirst({
@@ -882,7 +883,7 @@ const updateFinalMarks = async (payload: any) => {
   const totalFinalMarks =
     Math.ceil(midTermsMarks * 0.4) + Math.ceil(finalTermMarks * 0.6);
 
-  const result = getGrade(totalFinalMarks);
+  const result = await StudentSemesterUtils.getGrade(totalFinalMarks);
 
   await prisma.studentEnrolledCourse.updateMany({
     where: {
@@ -903,30 +904,55 @@ const updateFinalMarks = async (payload: any) => {
       status: StudentEnrolledCourseStatus.COMPLETED,
     },
   });
+
+  const grades = await prisma.studentEnrolledCourse.findMany({
+    where: {
+      student: {
+        id: studentId,
+      },
+      status: StudentEnrolledCourseStatus.COMPLETED,
+    },
+    include: {
+      course: true,
+    },
+  });
+
+  const academicResult = await StudentSemesterUtils.calcGradeAndCGPA(grades);
+
+  const studentAcademicInfo = await prisma.studentAcademicInfo.findFirst({
+    where: {
+      student: {
+        id: studentId,
+      },
+    },
+  });
+
+  if (studentAcademicInfo) {
+    await prisma.studentAcademicInfo.update({
+      where: {
+        id: studentAcademicInfo.id,
+      },
+      data: {
+        totalCompletedCredit: academicResult.totalCompletedCredit,
+        cgpa: academicResult.cgpa,
+      },
+    });
+  } else {
+    await prisma.studentAcademicInfo.create({
+      data: {
+        student: {
+          connect: {
+            id: studentId,
+          },
+        },
+        totalCompletedCredit: academicResult.totalCompletedCredit,
+        cgpa: academicResult.cgpa,
+      },
+    });
+  }
+
+  return grades;
 };
-
-async function getGrade(marks: any) {
-  // Define grade boundaries
-  const gradeBoundaries = [
-    { min: 0, max: 39, grade: "F", points: 0 },
-    { min: 40, max: 49, grade: "D", points: 1 },
-    { min: 50, max: 59, grade: "C", points: 2 },
-    { min: 60, max: 69, grade: "B", points: 3 },
-    { min: 70, max: 79, grade: "A", points: 4 },
-    { min: 80, max: 100, grade: "A+", points: 5 },
-  ];
-
-  // Find the appropriate grade based on marks
-  const gradeEntry = gradeBoundaries.find(
-    (entry) => marks >= entry.min && marks <= entry.max
-  );
-
-  // Return the payload object with the assigned grade
-  return {
-    grade: gradeEntry ? gradeEntry.grade : "Invalid marks", // Handle invalid input
-    piont: gradeEntry ? gradeEntry.points : "Invalid points",
-  };
-}
 
 export const semesterRegistrationService = {
   createSemesterRegistration,

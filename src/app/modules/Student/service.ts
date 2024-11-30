@@ -3,7 +3,7 @@ import { IGenericResponse, IPagniationOptions } from "../../../shared/interfaces
 import { ICondition, IStudentFilters, sortOrder } from "./interface";
 import { paginationHelper } from "../../../helper/paginationHelper";
 import { studentSearchableFields } from "./contants";
-import { Prisma, PrismaClient, Student } from "@prisma/client";
+import { Prisma, PrismaClient, Student, StudentEnrolledCourse } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -121,9 +121,27 @@ const updateStudent = async(id:string,payload:Partial<Student>):Promise<Student>
     return result
 }
 
+const myCourses = async(authId:string):Promise<StudentEnrolledCourse[]>=>{
+  const currentSemester = await prisma.academicSemester.findFirst({
+    where:{
+      isCurrent:true
+    }
+  })
+
+  const result = await prisma.studentEnrolledCourse.findMany({
+    where:{
+      student:{
+        studentId:authId
+      },academicSemesterId:currentSemester?.id
+    }
+  })
+  return result
+}
+
 export const studentServices = {
     getAllStudent,
     getSingleStudent,
     deleteStudent,
-    updateStudent
+    updateStudent,
+    myCourses
 }

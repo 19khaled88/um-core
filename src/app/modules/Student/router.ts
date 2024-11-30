@@ -9,6 +9,11 @@ const router = express.Router();
 
 router.get("/all", studentController.getAllStudent);
 router.get("/:id", studentController.getSingleStudent);
+router.get(
+  "/mycourse/:id",
+  auth(ENUM_USER_ROLE.STUDENT),
+  studentController.myCourses
+);
 router.delete(
   "/:id",
   auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),

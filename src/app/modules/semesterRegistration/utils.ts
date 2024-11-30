@@ -1,4 +1,4 @@
-import { ExamType } from "@prisma/client";
+import { Course, ExamType, StudentEnrolledCourse } from "@prisma/client";
 import prisma from "../../../helper/prismaKeyWrok";
 
 interface SemesterPaymentInput {
@@ -121,9 +121,57 @@ const createStudentsEnrolledCourseDefaultMarks = async (
   }
 };
 
+async function getGrade(marks: any) {
+  // Define grade boundaries
+  const gradeBoundaries = [
+    { min: 0, max: 39, grade: "F", points: 0 },
+    { min: 40, max: 49, grade: "D", points: 1 },
+    { min: 50, max: 59, grade: "C", points: 2 },
+    { min: 60, max: 69, grade: "B", points: 3 },
+    { min: 70, max: 79, grade: "A", points: 4 },
+    { min: 80, max: 100, grade: "A+", points: 5 },
+  ];
 
+  // Find the appropriate grade based on marks
+  const gradeEntry = gradeBoundaries.find(
+    (entry) => marks >= entry.min && marks <= entry.max
+  );
 
-export const StudentSemesterPayment = {
+  // Return the payload object with the assigned grade
+  return {
+    grade: gradeEntry ? gradeEntry.grade : "Invalid marks", // Handle invalid input
+    piont: gradeEntry ? gradeEntry.points : "Invalid points",
+  };
+}
+
+const calcGradeAndCGPA = async (
+  payload: (StudentEnrolledCourse & { course: Course })[]
+) => {
+  if (payload.length === 0) {
+    return {
+      totalCompletedCredit: 0,
+      cgpa: 0,
+    };
+  }
+  let totalCredit = 0;
+  let totalCGPA = 0;
+
+  for (const grade of payload) {
+    totalCGPA += grade.point || 0;
+    totalCredit += grade.course.credits || 0;
+  }
+
+  const avgCGPA = Number((totalCGPA / payload.length).toFixed(2));
+
+  return {
+    totalCompletedCredit: totalCredit,
+    cgpa: avgCGPA,
+  };
+};
+
+export const StudentSemesterUtils = {
   createSemesterPayment,
   createStudentsEnrolledCourseDefaultMarks,
+  getGrade,
+  calcGradeAndCGPA,
 };

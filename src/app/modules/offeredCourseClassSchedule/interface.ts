@@ -36,3 +36,5 @@ export type ICondition = {
     | { [key: string]: number }[];
   AND?: { [key: string]: string | number | boolean | null }[];
 };
+
+
