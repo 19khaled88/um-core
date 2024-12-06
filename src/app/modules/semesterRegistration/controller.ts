@@ -330,6 +330,28 @@ const updateFinalMarks = catchAsnc(async(req:Request,res:Response)=>{
   }
 })
 
+const getMySemesterRegisteredCourses=catchAsnc(async(req:Request,res:Response)=>{
+  try {
+    const user = (req as any).user;
+    const result = await semesterRegistrationService.getMySemesterRegisteredCourses(
+      user
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Registered courses fetched successfully!",
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: "No registered course found",
+      data: null,
+    });
+  }
+})
+
 export const semesterRegistrationController = {
   createSemesterRegistration,
   startNewSemester,
@@ -343,5 +365,6 @@ export const semesterRegistrationController = {
   confirmRegistration,
   getMyRegistrations,
   updateStudentMarks,
-  updateFinalMarks
+  updateFinalMarks,
+  getMySemesterRegisteredCourses
 };

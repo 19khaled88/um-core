@@ -824,7 +824,9 @@ const updateStudentMarks = async (payload: any) => {
   return updateStudentMarks;
 };
 
-const updateFinalMarks = async (payload: any):Promise<StudentEnrolledCourse[]> => {
+const updateFinalMarks = async (
+  payload: any
+): Promise<StudentEnrolledCourse[]> => {
   const { studentId, academicSemesterId, courseId } = payload;
 
   const studentEnrolledCourse = await prisma.studentEnrolledCourse.findFirst({
@@ -954,6 +956,108 @@ const updateFinalMarks = async (payload: any):Promise<StudentEnrolledCourse[]> =
   return grades;
 };
 
+const getMySemesterRegisteredCourses = async (user: { userId: string }) => {
+  const { userId } = user;
+
+  const student = await prisma.student.findFirst({
+    where: {
+      id: userId,
+    },
+  });
+
+  const semesterRegistration = await prisma.semesterRegistration.findFirst({
+    where: {
+      status: {
+        in: [
+          SemesterRegistrationStatus.ONGOING,
+          SemesterRegistrationStatus.UPCOMING,
+        ],
+      },
+    },
+    include: {
+      academicSemester: true,
+    },
+  });
+
+  if (!semesterRegistration) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "No semester registration found"
+    );
+  }
+
+  const studentCompletedCourse = await prisma.studentEnrolledCourse.findMany({
+    where: {
+      status: StudentEnrolledCourseStatus.COMPLETED,
+      student: {
+        id: student?.id,
+      },
+    },
+    include: {
+      course: true,
+    },
+  });
+
+  const stuentCurrentSemesterTakenCourse =
+    await prisma.studentSemesterRegistrationCourse.findMany({
+      where: {
+        student: {
+          id: student?.id,
+        },
+        semesterRegistration: {
+          id: semesterRegistration?.id,
+        },
+      },
+      include: {
+        offeredCourse: true,
+        offeredCourseSection: true,
+      },
+    });
+
+  const offeredCourse = await prisma.offeredCourse.findMany({
+    where: {
+      semesterRegistration: {
+        id: semesterRegistration.id,
+      },
+      academicDepartment: {
+        id: student?.academicDepartmentId,
+      },
+    },
+    include: {
+      course: {
+        include: {
+          preRequisite: {
+            include: {
+              preRequisite: true,
+            },
+          },
+        },
+      },
+      offeredCourseSections: {
+        include: {
+          offeredCourseClassSchedules: {
+            include: {
+              room: {
+                include: {
+                  building: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const availableCourses = await StudentSemesterUtils.getAvailableCourses(
+    offeredCourse,
+    studentCompletedCourse,
+    studentCompletedCourse
+  );
+
+  return availableCourses
+};
+
 export const semesterRegistrationService = {
   createSemesterRegistration,
   startNewSemester,
@@ -968,4 +1072,5 @@ export const semesterRegistrationService = {
   getMyRegistrations,
   updateStudentMarks,
   updateFinalMarks,
+  getMySemesterRegisteredCourses,
 };

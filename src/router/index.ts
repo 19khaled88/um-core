@@ -13,6 +13,7 @@ import { semester_registration_routes } from "../app/modules/semesterRegistratio
 import { offeredCourseRoutes } from "../app/modules/offeredCourse/router";
 import { offeredCourseSectionRoutes } from "../app/modules/offeredCourseSection/router";
 import { offeredCourseClassScheduleRoutes } from "../app/modules/offeredCourseClassSchedule/router";
+import { facultyRoutes } from "../app/modules/Faculty/router";
 
 
 
@@ -22,7 +23,8 @@ const moduleRoutes = [
     {
         path:'/academic-semester/',
         route:academicSemesterRoutes
-    },{
+    },
+    {
         path:'/academic-faculty/',
         route:academicfacultyRoutes
     },
@@ -41,6 +43,10 @@ const moduleRoutes = [
     {
         path:'/students',
         route:studentRouter
+    },
+    {
+        path:'/faculty',
+        route:facultyRoutes
     },
     {
         path:'/auth',

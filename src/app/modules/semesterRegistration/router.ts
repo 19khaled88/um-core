@@ -38,6 +38,12 @@ router.get(
 );
 
 router.get(
+  "/my-registered-course-list",
+  auth(ENUM_USER_ROLE.STUDENT),
+  semesterRegistrationController.getMySemesterRegisteredCourses
+);
+
+router.get(
   "/:id",
   auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   semesterRegistrationController.getSinglSemesterRegistration

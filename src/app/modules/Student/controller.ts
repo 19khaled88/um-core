@@ -90,7 +90,10 @@ const updateStudent = catchAsnc(async (req: Request, res: Response) => {
 
 const myCourses = catchAsnc(async (req: Request, res: Response) => {
   try {
-    const result = await studentServices.myCourses(req.params.id);
+    const user = (req as any).user;
+    // user.id
+    const filter = pick(req.query,['courseId','academicSemesterId'])
+    const result = await studentServices.myCourses(user.userId,filter);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -107,10 +110,56 @@ const myCourses = catchAsnc(async (req: Request, res: Response) => {
   }
 });
 
+const myCourseSchedule = catchAsnc(async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    // user.id
+    const filter = pick(req.query,['courseId','academicSemesterId'])
+    const result = await studentServices.myCourseSchedule(user.userId,filter);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "My course schedules found",
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: "No course schedule found yet",
+      data: null,
+    });
+  }
+});
+
+const myAcademicInfo = catchAsnc(async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    // user.id
+
+    const result = await studentServices.myAcademicInfo(user.userId);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "My academic info found",
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: "No academic info found yet",
+      data: null,
+    });
+  }
+});
+
 export const studentController = {
   getAllStudent,
   getSingleStudent,
   deleteStudent,
   updateStudent,
-  myCourses
+  myCourses,
+  myCourseSchedule,
+  myAcademicInfo
 };
