@@ -18,11 +18,32 @@ const prisma = new PrismaClient();
 const createAcademicSemester = async (
   payload: AcademicSemester
 ): Promise<AcademicSemester> => {
-  const result = await prisma.academicSemester.create({
-    data: payload,
-  });
+  const {title,code,year} = payload
 
-  return result;
+
+  // Optionally, you can set the code based on the mapper if needed
+  if(academicSemesterTitleCodeMapper[title] !== code){
+    throw new ApiError(400,'Invalid Semester Code')
+  }else{
+
+    const ifExist = await prisma.academicSemester.findFirst({
+      where:{
+        year:year,
+        title:title,
+        code:code
+      }
+    })
+
+    if(ifExist){
+      throw new ApiError(httpStatus.BAD_REQUEST,'This semester already exist')
+    }
+    const result = await prisma.academicSemester.create({
+      data: payload,
+    });
+  
+    return result;
+  }
+
 };
 
 const getAllSemesters = async (

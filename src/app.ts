@@ -34,10 +34,10 @@ app.use(globalErrorHandler)
 app.use((req,res,next)=>{
     res.status(httpStatus.NOT_FOUND).json({
         success:false,
-        message:'Not found',
+        message:'Core API Not found',
         errorMessages:[{
             path:req.originalUrl,
-            message:'API Not Found'
+            message:'Core API Not Found'
         }]
     })
     next()
