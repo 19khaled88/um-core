@@ -9,9 +9,10 @@ import {
   academicSemesternumericSearchableFields,
   academicSemesterSearchableFields,
 } from "../../../constants/academicSemester";
-import { academicSemesterTitleCodeMapper } from "./constants";
+import { academicSemesterTitleCodeMapper, EVENT_ACADEMIC_SEMESTER_CREATED, EVENT_ACADEMIC_SEMESTER_DELETED, EVENT_ACADEMIC_SEMESTER_UPDATED } from "./constants";
 import ApiError from "../../../errors/ApiError";
 import httpStatus from "http-status";
+import { RedisClient } from "../../../shared/redis";
 
 const prisma = new PrismaClient();
 
@@ -24,25 +25,30 @@ const createAcademicSemester = async (
   // Optionally, you can set the code based on the mapper if needed
   if(academicSemesterTitleCodeMapper[title] !== code){
     throw new ApiError(400,'Invalid Semester Code')
-  }else{
-
-    const ifExist = await prisma.academicSemester.findFirst({
-      where:{
-        year:year,
-        title:title,
-        code:code
-      }
-    })
-
-    if(ifExist){
-      throw new ApiError(httpStatus.BAD_REQUEST,'This semester already exist')
-    }
-    const result = await prisma.academicSemester.create({
-      data: payload,
-    });
-  
-    return result;
   }
+
+  const ifExist = await prisma.academicSemester.findFirst({
+    where:{
+      year:year,
+      title:title,
+      code:code
+    }
+  })
+
+  if(ifExist){
+    throw new ApiError(httpStatus.BAD_REQUEST,'This semester already exist')
+  }
+
+  const result = await prisma.academicSemester.create({
+    data: payload,
+  });
+  
+  if(result){
+    await RedisClient.publish(EVENT_ACADEMIC_SEMESTER_CREATED,JSON.stringify(result))
+  }
+
+  return result;
+  
 
 };
 
@@ -143,6 +149,17 @@ const getSingleSemester = async(id:string):Promise<AcademicSemester | null>=>{
 }
 
 const updateSemester = async(id:string,payload:Partial<AcademicSemester>):Promise<AcademicSemester>=>{
+
+    const ifExist = await prisma.academicSemester.findFirst({
+      where:{
+        id
+      }
+    })
+   
+    if(!ifExist){
+      throw new ApiError(httpStatus.NOT_FOUND,'This semester not found')
+    }
+
     if(payload.title && payload.code && academicSemesterTitleCodeMapper[payload.title] !== payload.code){
         throw new ApiError(httpStatus.BAD_REQUEST,'Semester must match with relevent code requirement')
     }else{
@@ -150,6 +167,10 @@ const updateSemester = async(id:string,payload:Partial<AcademicSemester>):Promis
             where:{id},
             data:payload
         })
+
+        if(result){
+          await RedisClient.publish(EVENT_ACADEMIC_SEMESTER_UPDATED,JSON.stringify(result))
+        }
     
         return result
     }
@@ -161,6 +182,9 @@ const deleteSemester = async(id:string):Promise<AcademicSemester>=>{
     const result = await prisma.academicSemester.delete({
         where:{id}
     })
+    if(result){
+      await RedisClient.publish(EVENT_ACADEMIC_SEMESTER_DELETED,JSON.stringify(result))
+    }
     return result
 }
 

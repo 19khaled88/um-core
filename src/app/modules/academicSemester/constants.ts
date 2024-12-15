@@ -13,3 +13,7 @@ export const academicSemesterTitleCodeMapper:{[key:string]:string}  ={
     Summer:'02',
     Fall:'03'
 }
+
+export const EVENT_ACADEMIC_SEMESTER_CREATED = 'academic_semester.created'
+export const EVENT_ACADEMIC_SEMESTER_UPDATED = 'academic_semester.updated'
+export const EVENT_ACADEMIC_SEMESTER_DELETED = 'academic_semester.deleted'

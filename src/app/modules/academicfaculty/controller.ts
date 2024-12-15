@@ -95,7 +95,6 @@ const updateAcademicFaculty = catchAsnc(
     }
   );
 
-
 const deleteAcademicFaculty = catchAsnc(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
