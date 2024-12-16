@@ -87,7 +87,7 @@ const updateAcademicDepartment = catchAsnc(
         sendResponse<AcademicDepartment>(res, {
           statusCode: httpStatus.OK,
           success: true,
-          message: "Update Faculty for given Id",
+          message: "Updated Faculty for given Id",
           data: result,
         });
       } catch (error) {
@@ -96,7 +96,6 @@ const updateAcademicDepartment = catchAsnc(
     }
   );
 
-
 const deleteAcademicDepartment = catchAsnc(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
@@ -104,7 +103,7 @@ const deleteAcademicDepartment = catchAsnc(
         sendResponse<AcademicDepartment>(res, {
           statusCode: httpStatus.OK,
           success: true,
-          message: "Delete Faculty for given Id",
+          message: "Deleted Faculty for given Id",
           data: result,
         });
       } catch (error) {

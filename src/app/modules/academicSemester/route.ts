@@ -18,9 +18,13 @@ router.get("/:id", academicSemesterController.getSingleSemester);
 router.put(
   "/:id",
   validationRequest(AcademicSemesterValidation.updateAcademicSemesterZodSchema),
-  auth(ENUM_USER_ROLE.SUPER_ADMIN,ENUM_USER_ROLE.ADMIN),
+  auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   academicSemesterController.updateSemester
 );
-router.delete("/:id", academicSemesterController.deleteSemester);
+router.delete(
+  "/:id",
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  academicSemesterController.deleteSemester
+);
 
 export const academicSemesterRoutes = router;

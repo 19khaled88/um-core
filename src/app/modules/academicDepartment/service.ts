@@ -7,6 +7,10 @@ import {
 import { paginationHelper } from "../../../helper/paginationHelper";
 import { IAcademicDepartmentFilters, ICondition, sortOrder } from "./interface";
 import { academicDepartmentSearchableFiels } from "../../../constants/academicDepartments";
+import { RedisClient } from "../../../shared/redis";
+import { EVENT_ACADEMIC_DEPARTMENT_CREATED, EVENT_ACADEMIC_DEPARTMENT_DELETED, EVENT_ACADEMIC_DEPARTMENT_UPDATED } from "./constants";
+import ApiError from "../../../errors/ApiError";
+import httpStatus from "http-status";
 
 const prisma = new PrismaClient();
 
@@ -17,7 +21,9 @@ const createAcademicDepartment = async (
       data: payload,
     });
     
-
+    if(result){
+      RedisClient.publish(EVENT_ACADEMIC_DEPARTMENT_CREATED,JSON.stringify(result))
+    }
     return result;
 };
 
@@ -141,18 +147,39 @@ const getSingleAcademicDepartment = async(id:string):Promise<AcademicDepartment 
 }
 
 const updateAcademicDepartment = async(id:string,payload:Partial<AcademicDepartment>):Promise<AcademicDepartment>=>{
-    
+    const ifExist = await prisma.academicDepartment.findFirst({
+      where:{
+        id:id
+      }
+    });
+    if(!ifExist){
+      throw new ApiError(httpStatus.NOT_FOUND,'Data not found for given ID')
+    }
     const result = await prisma.academicDepartment.update({
         where:{id},
         data:payload
-    })
+    });
+    if(result){
+      RedisClient.publish(EVENT_ACADEMIC_DEPARTMENT_UPDATED,JSON.stringify(result))
+    }
     return result
 }
 
 const deleteAcademicDepartment = async(id:string):Promise<AcademicDepartment>=>{
+  const ifExist = await prisma.academicDepartment.findFirst({
+    where:{
+      id:id
+    }
+  });
+  if(!ifExist){
+    throw new ApiError(httpStatus.NOT_FOUND,'Data not found for given ID')
+  }
     const result = await prisma.academicDepartment.delete({
         where:{id}
     })
+    if(result){
+      RedisClient.publish(EVENT_ACADEMIC_DEPARTMENT_DELETED,JSON.stringify(result))
+    }
     return result
 }
 

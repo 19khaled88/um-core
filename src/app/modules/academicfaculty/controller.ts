@@ -86,7 +86,7 @@ const updateAcademicFaculty = catchAsnc(
         sendResponse<AcademicFaculty>(res, {
           statusCode: httpStatus.OK,
           success: true,
-          message: "Update Faculty for given Id",
+          message: "Updated Faculty for given Id",
           data: result,
         });
       } catch (error) {
@@ -102,7 +102,7 @@ const deleteAcademicFaculty = catchAsnc(
         sendResponse<AcademicFaculty>(res, {
           statusCode: httpStatus.OK,
           success: true,
-          message: "Delete Faculty for given Id",
+          message: "Deleted Faculty for given Id",
           data: result,
         });
       } catch (error) {

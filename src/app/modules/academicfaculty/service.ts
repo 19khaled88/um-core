@@ -7,7 +7,7 @@ import { IAcademicFacultyFilters, ICondition, sortOrder } from "./interface";
 import { paginationHelper } from "../../../helper/paginationHelper";
 import { academicFacultySearchableFiels } from "../../../constants/academicFaculty";
 import { RedisClient } from "../../../shared/redis";
-import { EVENT_ACADEMIC_FACULTY_CREATED, EVENT_ACADEMIC_FACULTY_UPDATED } from "./constants";
+import { EVENT_ACADEMIC_FACULTY_CREATED, EVENT_ACADEMIC_FACULTY_DELETED, EVENT_ACADEMIC_FACULTY_UPDATED } from "./constants";
 import ApiError from "../../../errors/ApiError";
 import httpStatus from "http-status";
 
@@ -171,9 +171,20 @@ const updateAcademicFaculty = async (
 };
 
 const deleteAcademicFaculty = async (id: string): Promise<AcademicFaculty> => {
+  const ifExist = await prisma.academicFaculty.findFirst({
+    where:{
+      id:id
+    }
+  })
+  if(!ifExist){
+    throw new ApiError(httpStatus.NOT_FOUND,'Data not found for given ID')
+  }
   const result = await prisma.academicFaculty.delete({
     where: { id },
   });
+  if(result){
+    await RedisClient.publish(EVENT_ACADEMIC_FACULTY_DELETED,JSON.stringify(result))
+  }
   return result;
 };
 
