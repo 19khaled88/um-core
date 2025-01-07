@@ -4,6 +4,7 @@ import config from "./config";
 import { successLogger, errorLogger } from "./shared/logger/logger";
 import { Server } from "http";
 import { RedisClient } from "./shared/redis";
+import subscribeToEvents from "./app/events";
 
 process.on("uncaughtException", (err) => {
   errorLogger.error(err);
@@ -15,7 +16,9 @@ const prisma = new PrismaClient();
 
 async function dbConn() {
   try {
-    await RedisClient.connect();
+    await RedisClient.connect().then(()=>{
+      subscribeToEvents();
+    });
     await prisma.$connect();
     successLogger.info("Postgresql database connected successfully");
 

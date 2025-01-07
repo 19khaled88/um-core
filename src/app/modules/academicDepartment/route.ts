@@ -20,12 +20,12 @@ router.get("/:id", academicDepartmentController.getSingleAcademicDepartment);
 router.put(
   "/:id",
   validationRequest(AcademicDepartmentValiation.updateDepartmentZodSchema),
-  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   academicDepartmentController.updateAcademicDepartment
 );
 router.delete(
   "/:id",
-  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   academicDepartmentController.deleteAcademicDepartment
 );
 

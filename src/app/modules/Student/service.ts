@@ -259,6 +259,30 @@ const myAcademicInfo = async (userId: string) => {
   }
 };
 
+const create_Student_From_Events = async(e:any)=>{
+  const studentData:Partial<Student> = {
+    studentId: e.id,
+    firstName: e.name.firstName,
+    lastName: e.name.lastName,
+    middleName:e.name.middleName,
+    profileImage:e.profileImage,
+    email:e.email,
+    dateOfBirth:e.dateOfBirth,
+    emergencyContactNo:e.emergencyContactNo,
+    permanentAddress:e.permanentAddress,
+    presentAddress:e.presentAddress,
+    contactNo :e.contactNo,
+    gender:e.gender,
+    bloodGroup:e.bloodGroup,
+    academicFacultyId:e.academicFaculty.syncId,
+    academicSemesterId:e.academicSemester.syncId,
+    academicDepartmentId:e.academicDepartment.syncId,
+  }
+
+  await prisma.student.create({data:studentData as Student})
+}
+
+
 export const studentServices = {
   getAllStudent,
   getSingleStudent,
@@ -267,4 +291,5 @@ export const studentServices = {
   myCourses,
   myCourseSchedule,
   myAcademicInfo,
+  create_Student_From_Events
 };
