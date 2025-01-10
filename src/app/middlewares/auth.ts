@@ -9,7 +9,6 @@ const auth =
   (...roles: string[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-     
       
       // let token = req.headers.authorization;
       let token = req.headers["authorization"]
@@ -30,8 +29,6 @@ const auth =
   
         throw new ApiError(httpStatus.FORBIDDEN, "Invalid token");
       }
-
-      
       
       // Type guard to check that verifiedToken is a JwtPayload
       if (typeof verifiedToken !== "string" && "role" in verifiedToken) {

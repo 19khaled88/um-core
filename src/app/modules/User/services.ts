@@ -170,6 +170,7 @@ const createAdmin = async()=>{
 
 export const userService = {
   createStudent,
-  createFaculty
+  createFaculty,
+  createAdmin
 }
 
