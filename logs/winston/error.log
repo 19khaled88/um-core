@@ -1,2 +1,6 @@
 {"code":"ERR_HTTP_INVALID_STATUS_CODE","level":"error","service":"user-service","timestamp":"2024-11-01 19:26:01"}
 {"address":"::","code":"EADDRINUSE","errno":-4091,"level":"error","port":5000,"service":"user-service","syscall":"listen","timestamp":"2024-12-06 01:39:39"}
+{"level":"error","service":"user-service","timestamp":"2025-01-14 00:53:57"}
+{"level":"error","service":"user-service","timestamp":"2025-01-14 00:56:11"}
+{"level":"error","service":"user-service","timestamp":"2025-01-14 00:57:12"}
+{"level":"error","message":"Database connection failed","service":"user-service","timestamp":"2025-01-17 20:50:14"}

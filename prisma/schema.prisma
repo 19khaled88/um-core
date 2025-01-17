@@ -132,6 +132,7 @@ model Faculty {
   academicFacultyId           String
   academicDepartment          AcademicDepartment           @relation(fields: [academicDepartmentId], references: [id])
   academicDepartmentId        String
+  syncId                      String
   users                       User[]
   courseFaculties             CourseFaculty[]
   offeredCourseClassSchedules OfferedCourseClassSchedule[]

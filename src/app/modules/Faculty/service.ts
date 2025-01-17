@@ -1,5 +1,8 @@
 import { Faculty, Prisma, PrismaClient } from "@prisma/client";
 import { FacultyCreatedEvent } from "./interface";
+import ApiError from "../../../errors/ApiError";
+import httpStatus from "http-status";
+import { FileUploadCloudinary } from "../../../helper/cloudinary";
 
 const prisma = new PrismaClient();
 const myCourses = async (
@@ -79,6 +82,8 @@ const myCourses = async (
   return courseAndSchedule
 };
 
+
+
 const createFacultyFromEvent = async(e:FacultyCreatedEvent):Promise<void> =>{
   const faculty={
     facultyId:e.id,
@@ -97,10 +102,10 @@ const createFacultyFromEvent = async(e:FacultyCreatedEvent):Promise<void> =>{
     emergencyContactNo:e.emergencyContactNo,
     presentAddress:e.presentAddress,
     permanentAddress:e.permanentAddress,
+    syncId:e.syncId,
   }
 
-
-  const response = await prisma.faculty.create({
+  await prisma.faculty.create({
     data:faculty
   })
 }
@@ -134,7 +139,7 @@ const updateFacultyFromEvent = async(e:any):Promise<void> =>{
       permanentAddress:e.permanentAddress,
     };
 
-    const res = await prisma.faculty.update({
+    await prisma.faculty.update({
       where:{
         id:isExist.id 
       },
@@ -143,9 +148,35 @@ const updateFacultyFromEvent = async(e:any):Promise<void> =>{
   }
 }
 
+const deleteFacultyFromEvent = async(e:any):Promise<void> =>{
+  
+  const isExist = await prisma.faculty.findFirst({
+    where:{
+      syncId:e._id
+    }
+  });
+ 
+  if(isExist){
+    const deleted = await prisma.faculty.delete({
+      where:{
+        id:isExist.id
+      }
+    })
+
+    if(deleted){
+     const res = await FileUploadCloudinary.deleteFromCloudinary(e.profileImage,'single')
+     
+     
+    }
+    
+  }
+  
+}
+
 
 export const facultyService = {
   myCourses,
   createFacultyFromEvent,
-  updateFacultyFromEvent
+  updateFacultyFromEvent,
+  deleteFacultyFromEvent
 };
