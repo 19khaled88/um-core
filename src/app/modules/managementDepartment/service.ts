@@ -3,6 +3,7 @@ import {
   ICondition,
   IManagementDepartment,
   IManagementDepartmentFilters,
+  IMnagementDepartmentEvents,
   sortOrder,
 } from "./interface";
 import {
@@ -11,6 +12,8 @@ import {
 } from "../../../shared/interfaces";
 import { paginationHelper } from "../../../helper/paginationHelper";
 import { managementDepartmentSearchableFields } from "./constants";
+import ApiError from "../../../errors/ApiError";
+import httpStatus from "http-status";
 
 
 const prisma = new PrismaClient();
@@ -146,11 +149,51 @@ const updateManagementDeprt = async (
   return result;
 };
 
+const createManagementDepartmentFromEvents = async(e:IMnagementDepartmentEvents)=>{
+  const managementDepartment ={
+    title:e.title,
+    syncId:e._id
+  }
+  await prisma.managementDepartment.create({data:managementDepartment})
+}
+
+const updateManagementDepartmentFromEvents = async(e:Partial<IMnagementDepartmentEvents>)=>{
+  const managementDepartment = {
+    title:e.title,
+  }
+
+  const isExist = await prisma.managementDepartment.findFirst({where:{syncId:e._id}})
+  if(!isExist){
+    throw new ApiError(httpStatus.NOT_FOUND,'This ID not found')
+  }
+  await prisma.managementDepartment.update({
+    where:{
+      id:isExist.id
+    },
+    data:managementDepartment
+  })
+}
+
+const deleteManagementDepartmentFromEvents = async(e:Partial<IMnagementDepartmentEvents>)=>{
+  const isExist = await prisma.managementDepartment.findFirst({where:{syncId:e._id}})
+  if(!isExist){
+    throw new ApiError(httpStatus.NOT_FOUND,'This ID not found')
+  }
+  await prisma.managementDepartment.delete({
+    where:{
+      id:isExist.id
+    }
+  })
+}
+
 
 export const managementDepartmentService = {
   createDepartment,
   getAllManagementDepart,
   getSinglemanagementDeprt,
   deleteManagementDeprt,
-  updateManagementDeprt
+  updateManagementDeprt,
+  createManagementDepartmentFromEvents,
+  updateManagementDepartmentFromEvents,
+  deleteManagementDepartmentFromEvents
 }

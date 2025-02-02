@@ -82,8 +82,6 @@ const myCourses = async (
   return courseAndSchedule
 };
 
-
-
 const createFacultyFromEvent = async(e:FacultyCreatedEvent):Promise<void> =>{
   const faculty={
     facultyId:e.id,

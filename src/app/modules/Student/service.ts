@@ -277,9 +277,61 @@ const create_Student_From_Events = async(e:any)=>{
     academicFacultyId:e.academicFaculty.syncId,
     academicSemesterId:e.academicSemester.syncId,
     academicDepartmentId:e.academicDepartment.syncId,
+    syncId:e.syncId
+  }
+  await prisma.student.create({data:studentData as Student})
+}
+
+const updated_student_From_Events = async(e:any)=>{
+  const studentData:Partial<Student> = {
+    studentId: e.id,
+    firstName: e.name.firstName,
+    lastName: e.name.lastName,
+    middleName:e.name.middleName,
+    profileImage:e.profileImage,
+    email:e.email,
+    dateOfBirth:e.dateOfBirth,
+    emergencyContactNo:e.emergencyContactNo,
+    permanentAddress:e.permanentAddress,
+    presentAddress:e.presentAddress,
+    contactNo :e.contactNo,
+    gender:e.gender,
+    bloodGroup:e.bloodGroup,
+    academicFacultyId:e.academicFaculty.syncId,
+    academicSemesterId:e.academicSemester.syncId,
+    academicDepartmentId:e.academicDepartment.syncId,
+    syncId:e._id
   }
 
-  await prisma.student.create({data:studentData as Student})
+  const isExist = await prisma.student.findFirst({
+    where:{
+      syncId:e._id
+    }
+  })
+  
+  if(isExist){
+    await prisma.student.update({
+      where:{id:isExist.id},
+      data:studentData
+    })
+  }
+ 
+}
+
+const delete_student_from_event=async(e:any)=>{
+
+  const isExist = await prisma.student.findFirst({
+    where:{
+      syncId:e._id
+    }
+  })
+  if(isExist){
+    await prisma.student.delete({
+      where:{
+        id:isExist.id
+      }
+    })
+  }
 }
 
 
@@ -291,5 +343,7 @@ export const studentServices = {
   myCourses,
   myCourseSchedule,
   myAcademicInfo,
-  create_Student_From_Events
+  create_Student_From_Events,
+  updated_student_From_Events,
+  delete_student_from_event
 };
