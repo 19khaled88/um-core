@@ -94,19 +94,21 @@ model Student {
 }
 
 model User {
-  id                String   @id @default(uuid())
+  id                String      @id @default(uuid())
   role              String
   password          String
-  needsPassChange   Boolean  @default(true)
+  needsPassChange   Boolean     @default(true)
   passwordChangedAt DateTime
-  students          Student? @relation(fields: [studentId], references: [id])
-  studentId         String?  @unique
-  faculties         Faculty? @relation(fields: [facultyId], references: [id])
+  students          Student?    @relation(fields: [studentId], references: [id])
+  studentId         String?     @unique
+  faculties         Faculty?    @relation(fields: [facultyId], references: [id])
   facultyId         String?
-  admins            Admin?   @relation(fields: [adminId], references: [id])
+  admins            Admin?      @relation(fields: [adminId], references: [id])
   adminId           String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  superAdmins       SuperAdmin? @relation(fields: [superAdminId], references: [id])
+  superAdminId      String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 
   @@map("users")
 }
@@ -226,13 +228,42 @@ model Admin {
   @@map("admins")
 }
 
+model SuperAdmin {
+  id                     String               @id @default(uuid())
+  superAdminId           String
+  firstName              String
+  lastName               String
+  middleName             String?
+  profileImage           String?
+  email                  String               @unique
+  contactNo              String               @unique
+  emergencyContactNo     String
+  presentAddress         String
+  permanentAddress       String
+  dateOfBirth            String?
+  gender                 String
+  bloodGroup             String?
+  designation            String
+  isSuperAdmin           Boolean              @default(true)
+  permissions            String[]             @default(["manage-users", "manage-settings", "full-access"])
+  managementDepartments  ManagementDepartment @relation(fields: [managementDepartmentId], references: [id])
+  managementDepartmentId String
+  syncId                 String
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  User                   User[]
+
+  @@map("superadmins")
+}
+
 model ManagementDepartment {
-  id        String   @id @default(uuid())
-  title     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  syncId    String
-  admins    Admin[]
+  id          String       @id @default(uuid())
+  title       String       @unique
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  syncId      String
+  admins      Admin[]
+  superadmins SuperAdmin[]
 
   @@map("managementdepartments")
 }

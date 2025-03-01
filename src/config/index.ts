@@ -10,6 +10,7 @@ export default {
     default_st_pass:process.env.DEFAULT_STD_PASS,
     default_faculty_pass:process.env.DEFAULT_FACLTY_PASS,
     bcyrpt_salt_rounds:process.env.BCRYPT_SALT_ROUNDS,
+    auth_apigateway_url:process.env.AUTH_SERVICE_URL,
     jwt:{
         token:process.env.JWT_SECRET,
         token_expire:process.env.JWT_EXPIRES_IN,
