@@ -7,13 +7,17 @@ import {
   StudentEnrolledCourseStatus,
 } from "@prisma/client";
 import { RedisClient } from "../../../shared/redis";
+import { EVENT_SUPER_ADMIN_CREATE_RESPONSE, EVENT_SUPER_ADMIN_DELETED } from "./constants";
+import { SuperAdminCreateResponse } from "./interface";
 
 const prisma = new PrismaClient();
 
 const create_super_admin_from_events = async(e:any)=>{
   try {
     
-    const manageDeptId = await prisma.managementDepartment.findFirst({where:{syncId:e.managementDepartmentId}})
+    const manageDeptId = await prisma.managementDepartment.findFirst({
+      where:{syncId:e.managementDepartmentId}
+    });
     
     const superAdminData:Partial<SuperAdmin> = {
       superAdminId: e.id,
@@ -37,12 +41,15 @@ const create_super_admin_from_events = async(e:any)=>{
     }
     
     await prisma.superAdmin.create({data:superAdminData as SuperAdmin})
+
+    const response: SuperAdminCreateResponse = { success: true };
+    await RedisClient.publish(EVENT_SUPER_ADMIN_CREATE_RESPONSE,JSON.stringify(response))
   } catch (error) {
-    //  try {
-    //     await RedisClient.
-    //  } catch (error) {
-      
-    //  }
+    if (error instanceof Prisma.PrismaClientValidationError ||  error instanceof Prisma.PrismaClientKnownRequestError || error instanceof Prisma.PrismaClientUnknownRequestError) {
+          await RedisClient.publish(EVENT_SUPER_ADMIN_DELETED,JSON.stringify(e))
+    }
+    const response: SuperAdminCreateResponse = { success: false };
+    await RedisClient.publish(EVENT_SUPER_ADMIN_CREATE_RESPONSE,JSON.stringify(response))
   }
 
 }

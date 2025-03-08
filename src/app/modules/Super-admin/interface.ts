@@ -83,3 +83,7 @@ export type SuperAdminCreatedEvent = {
     };
   };
   
+  export type SuperAdminCreateResponse = {
+    success: boolean;
+  };
+  
