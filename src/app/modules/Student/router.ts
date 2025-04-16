@@ -8,7 +8,6 @@ import { ENUM_USER_ROLE } from "../../../enums/user";
 const router = express.Router();
 
 router.get("/all", studentController.getAllStudent);
-router.get("/:id", studentController.getSingleStudent);
 router.get(
   "/mycourse",
   auth(ENUM_USER_ROLE.STUDENT),
@@ -24,6 +23,8 @@ router.get(
   auth(ENUM_USER_ROLE.STUDENT),
   studentController.myAcademicInfo
 );
+router.get("/:id", studentController.getSingleStudent);
+
 router.delete(
   "/:id",
   auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),

@@ -59,7 +59,10 @@ const disconnect = async (): Promise<void> => {
   await redisSubClient.quit();
 };
 
-
+const unsubscribe = async(channel:string):Promise<void>=>{
+  await redisClient.unsubscribe(channel);
+  console.log(`Unsubscribed from channel: ${channel}`);
+}
 export const RedisClient = {
   connect,
   set,
@@ -71,4 +74,5 @@ export const RedisClient = {
   disconnect,
   publish: redisPubClient.publish.bind(redisPubClient),
   subscribe: redisSubClient.subscribe.bind(redisSubClient),
+  unsubscribe,
 };
